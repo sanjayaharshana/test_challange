@@ -32,4 +32,6 @@ jobs:
       env:
         DB_CONNECTION: sqlite
         DB_DATABASE: database/database.sqlite
+    - name: Migrate Database
+      run: php artisan migrate
       run: vendor/bin/phpunit

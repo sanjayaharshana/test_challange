@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\File;
 class LogsController extends Controller
 {
     public function index()
     {
+        Log::info('Requesting Open Logfile');
         try{
+            // Open Logfile
             $file = fopen(storage_path("logs/laravel.log"), "r");
+            Log::info('Logfile Readerble: '.storage_path("logs/laravel.log"));
             $a = 1;
             $outArray = [];
             while ($line = fgets($file)) {
@@ -40,7 +44,7 @@ class LogsController extends Controller
                 'error' => 'internal_server_error',
                 'message' => 'Internal Server Error, Cannot read logfile'
             ];
-            return response()->json($returnResponseData,405);
+            return response()->json($returnResponseData,500);
         }
 
 

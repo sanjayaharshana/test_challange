@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-
+use Illuminate\Support\Facades\Log;
 class Authenticate extends Middleware
 {
     /**
@@ -22,6 +22,7 @@ class Authenticate extends Middleware
 
     protected function unauthenticated($request, array $guards)
     {
+        Log:info('Bearer Token Invalid');
         abort(response()->json(
             [
                 'error' => 'unauthenticated',

@@ -31,8 +31,3 @@ Route::group(['middleware' => 'auth:sanctum'], function()
     Route::get('logs', [LogsController::class,'index'])->name('get.logs');
 
 });
-
-
-//Route::middleware('')->get('/user', function (Request $request) {
-//    return $request->user();
-//});

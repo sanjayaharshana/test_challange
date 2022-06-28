@@ -14,8 +14,18 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
+
         if (! $request->expectsJson()) {
             return route('login');
         }
+    }
+
+    protected function unauthenticated($request, array $guards)
+    {
+        abort(response()->json(
+            [
+                'error' => 'unauthenticated',
+                'message' => 'Barer token invalid or expired',
+            ], 401));
     }
 }

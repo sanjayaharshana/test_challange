@@ -1,9 +1,9 @@
+name: Laravel CI
+
 on: 
   push:
     paths:
       - './laravel'
-  
-name: Laravel CI
 jobs:
   phpunit:
     runs-on: ubuntu-latest

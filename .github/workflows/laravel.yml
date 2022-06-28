@@ -34,4 +34,5 @@ jobs:
         DB_DATABASE: database/database.sqlite
     - name: Migrate Database
       run: php artisan migrate
+    - name: Unit Testing (PHP Unit)
       run: vendor/bin/phpunit

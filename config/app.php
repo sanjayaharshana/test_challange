@@ -143,6 +143,22 @@ return [
         // 'store'  => 'redis',
     ],
 
+
+    /*
+   |--------------------------------------------------------------------------
+   | WooCommerce Configuration - Kodeia Technologies
+   |--------------------------------------------------------------------------
+   |
+   | Kodeia Technologies Provided endpoints for online wordpress Woocommerce website
+   | its endpoint you called .env file. and config default values for that
+   |
+   */
+
+    'woocom_endpoint' => env('WOOCOM_ENDPOINT', 'http://localhost'),
+    'woocom_cusum_key' => env('WOOCOM_CUSUMER_KEY', 'ck_e6415ebb42b985a9985b5f99b5fddcbfbffda72a'),
+    'woocom_cusum_secret' => env('WOOCOM_CUSUMER_SECRECT', 'cs_4414f67bcf3dcf8d2dfc1cd7a0c1117010211d88'),
+    'product_sync_limit' => env('SYNC_PRODUCT_LIMIT', '10'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\LogsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -28,6 +28,7 @@ Route::group(['middleware' => 'auth:sanctum'], function()
 {
     //All the routes that belongs to the group goes here
     Route::get('products', [ProductController::class,'index'])->name('get.products');
+    Route::get('logs', [LogsController::class,'index'])->name('get.logs');
 
 });
 

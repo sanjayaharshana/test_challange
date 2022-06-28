@@ -42,17 +42,16 @@ class SyncWooComProduct implements ShouldQueue
 
             $response = Http::withBasicAuth(config('app.woocom_cusum_key'), config('app.woocom_cusum_secret'))
                 ->get(config('app.woocom_endpoint'));
-
             Log::info('Requesting Endpoint: '. config('app.woocom_endpoint'));
             Log::info('Using with: '. 'Consumer Secret: '.config('app.woocom_cusum_secret'));
             Log::info('Using with: '. 'Consumer Key: '.config('app.woocom_cusum_key'));
 
             // Response Time Calulation Request  Now Time (Microtime) - Request Start Time / secounds;
             $responseTime = (microtime(true) - $startTime)/60 ;
-
             Log::info('Response Status: '. $response->status());
             Log::info('Response Time: '. $responseTime );
 
+            // Decode jsonResponse body
             $outputProducts = json_decode($response->body());
 
             //Store API Response Detail APIReponse Table;
@@ -77,6 +76,8 @@ class SyncWooComProduct implements ShouldQueue
                             if(++ $i == 1 + config('app.product_sync_limit')){
                                 break;
                             }else{
+
+                                // WooCommerce Product added ProductTable
                                 $prodDetails = new Product;
                                 $prodDetails->product_id = $wooitem->id;
                                 $prodDetails->name = $wooitem->name;

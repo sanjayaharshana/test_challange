@@ -16,6 +16,6 @@ class ProductSyncTest extends TestCase
     public function test_woocommerce_product_sync()
     {
         $this->artisan('sync:wooproducts')
-            ->expectsOutput('WooCommerce Product Synchronize...')
+            ->expectsOutput('WooCommerce Product Synchronize...');
     }
 }

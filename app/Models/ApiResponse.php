@@ -140,6 +140,13 @@ class ApiResponse extends Model
 
     public static function callAPIGetProducts($page = null)
     {
+        $lastResopnseData = self::getLastEndpointDetails(config('app.woocom_endpoint'));
+//        if($lastResopnseData->){
+//
+//        }else{
+//
+//        }
+
         $startTime = microtime(true);
         if($page){
             $response = $response = Http::withBasicAuth(config('app.woocom_cusum_key'), config('app.woocom_cusum_secret'))

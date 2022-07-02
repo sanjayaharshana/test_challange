@@ -48,6 +48,7 @@ class SyncWooComProduct implements ShouldQueue
                         // Call API and Get Response
                         $response = ApiResponse::callAPIGetProducts($this->page_number);
                         // Save Product to Database
+
                         ApiResponse::saveProductFromResponse($response['response']);
                     }else{
                         // Run response for 5min( 300s)

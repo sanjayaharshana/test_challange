@@ -36,12 +36,14 @@ class SyncWooComProducts extends Command
         try {
             //Get Starting Time
 
+            $this->info('WooCommerce Product Synchronize...');
             // Get recent response from woocommerce
             $getlastResponse = ApiResponse::getLastEndpointDetails(config('app.woocom_endpoint'));
             Log::info('Get last Response ID:'.$getlastResponse);
 
             //Check last response is avaible
             if ($getlastResponse) {
+                $this->info('Old Response Data Found');
                 // Loop Pages from total page count
                 for ($x = $getlastResponse->page_number + 1; $x <= $getlastResponse->total_page_count; $x++) {
                     // Excute Queue Job with Last Response
@@ -51,6 +53,7 @@ class SyncWooComProducts extends Command
                 }
             } else {
                 // Excute Queue Job Fist time
+                $this->info('Old Response Data Notfound');
                 SyncWooComProduct::dispatch(1);
                 sleep(15);
                 $exitCode = Artisan::call('sync:wooproducts');

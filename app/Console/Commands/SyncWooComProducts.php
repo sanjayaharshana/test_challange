@@ -45,9 +45,8 @@ class SyncWooComProducts extends Command
                 // Loop Pages from total page count
                 for ($x = $getlastResponse->page_number + 1; $x <= $getlastResponse->total_page_count; $x++) {
                     // Excute Queue Job with Last Response
-                    if($getlastResponse->total_page_count != $getlastResponse->page_number){
-                        SyncWooComProduct::dispatch($x);
-                    }
+                    SyncWooComProduct::dispatch($x);
+
 
                 }
             } else {

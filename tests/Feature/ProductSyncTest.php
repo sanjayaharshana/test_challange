@@ -17,6 +17,5 @@ class ProductSyncTest extends TestCase
     {
         $this->artisan('sync:wooproducts')
             ->expectsOutput('WooCommerce Product Synchronize...')
-            ->expectsOutput('Sync Queue Job Starting: 1 Minutes');
     }
 }

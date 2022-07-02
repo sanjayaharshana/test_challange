@@ -61,3 +61,13 @@ You can check if this function is working
 I have also created some Unit Testing to test some of these APIs. You can also test them. I was unable to release github action. There is a problem with the yml database.
 
     php artisan test
+    
+## Server Configration Task Scheduling 
+When using Laravel's scheduler, we only need to add a single cron configuration entry to our server that runs the schedule:run command every minute. 
+
+    * * * * * cd /test_challange && php artisan schedule:run >> /dev/null 2>&1
+    
+## Schedule Run Locally
+
+    php artisan schedule:work
+    

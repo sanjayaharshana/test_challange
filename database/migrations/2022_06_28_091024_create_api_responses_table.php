@@ -21,6 +21,9 @@ return new class extends Migration
             $table->text('status_code')->nullable();
             $table->text('start_time')->nullable();
             $table->text('end_time')->nullable();
+            $table->text('page_number')->nullable();
+            $table->text('product_count')->nullable();
+            $table->text('total_page_count')->nullable();
             $table->timestamps();
         });
     }

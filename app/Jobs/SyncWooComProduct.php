@@ -21,9 +21,11 @@ class SyncWooComProduct implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
+    private $page_number;
+
+    public function __construct($page_number)
     {
-        //
+        $this->page_number = $page_number;
     }
 
     /**
@@ -34,68 +36,52 @@ class SyncWooComProduct implements ShouldQueue
     public function handle()
     {
         try{
-            //Get Starting Time
-            $startTime = microtime(true);
-
-            // Call Woocommerce API with Http Client
-            // Authentication ENV Ver or App.Config
-
-            $response = Http::withBasicAuth(config('app.woocom_cusum_key'), config('app.woocom_cusum_secret'))
-                ->get(config('app.woocom_endpoint'));
-            Log::info('Requesting Endpoint: '. config('app.woocom_endpoint'));
-            Log::info('Using with: '. 'Consumer Secret: '.config('app.woocom_cusum_secret'));
-            Log::info('Using with: '. 'Consumer Key: '.config('app.woocom_cusum_key'));
-
-            // Response Time Calulation Request  Now Time (Microtime) - Request Start Time / secounds;
-            $responseTime = (microtime(true) - $startTime)/60 ;
-            Log::info('Response Status: '. $response->status());
-            Log::info('Response Time: '. $responseTime );
-
-            // Decode jsonResponse body
-            $outputProducts = json_decode($response->body());
-
-            //Store API Response Detail APIReponse Table;
-            $responseDetails = new ApiResponse;
-            $responseDetails::startResponse(
-                config('app.woocom_endpoint'),
-                $response->body(),
-                $responseTime,$response->status(),
-                $startTime,microtime(true));
-
-            // Define i variable for loop counts
-            $i = 0;
-
-            if($response->status() == 200){
-                Log::info('Response Product Count: '. count($outputProducts) );
-                Log::info('Product Limit: '. config('app.product_sync_limit') );
-                if(count($outputProducts) !=0)
-                {
-                    foreach ($outputProducts as $wooitem)
-                    {
-                        if(Product::where('product_id',$wooitem->id)->first() == null){
-                            if(++ $i == 1 + config('app.product_sync_limit')){
-                                break;
-                            }else{
-
-                                // WooCommerce Product added ProductTable
-                                $prodDetails = new Product;
-                                $prodDetails->product_id = $wooitem->id;
-                                $prodDetails->name = $wooitem->name;
-                                $prodDetails->price = number_format($wooitem->price,2);
-                                $prodDetails->description = strip_tags($wooitem->description);
-                                $prodDetails->save();
-                                Log::info('WoooCommerce ProductID: '.$wooitem->id. '('.$wooitem->name.') added');
-                            }
-                        }
+            //Get Last Response
+            $getlastResponse = ApiResponse::getLastEndpointDetails(config('app.woocom_endpoint'));
+            //Check Last Request Available
+            if($getlastResponse){
+                //Check lasted response time < 1
+                    if($getlastResponse->response_time < 1){
+                        // Waiting response for 60s
+                        sleep(60);
+                        Log::info('Page Number: '.$this->page_number);
+                        // Call API and Get Response
+                        $response = ApiResponse::callAPIGetProducts($this->page_number);
+                        // Save Product to Database
+                        ApiResponse::saveProductFromResponse($response['response']);
+                    }else{
+                        // Run response for 5min( 300s)
+                        sleep(300);
+                        Log::info('Page Number: '.$this->page_number);
+                        // Call API and get Response
+                        $response = ApiResponse::callAPIGetProducts($this->page_number);
+                        //Save product to Database;
+                        ApiResponse::saveProductFromResponse($response['response']);
                     }
 
-                }
             }else{
-                Log::critical('Invalid Response: ' . $response->status());
+                // If First time Sync Data/ Wihtout History response
+                Log::info('Page Number: '.$this->page_number);
+                $response = ApiResponse::callAPIGetProducts(1);
+                ApiResponse::saveProductFromResponse($response['response']);
             }
-
         }catch (\Exception $exception){
+            // If something wrong run again
+           $this->retryUntil();
             Log::critical($exception);
         }
+
+
+    }
+
+    public function failed()
+    {
+        // ... what exception was thrown? ...
+
+    }
+
+    public function retryUntil()
+    {
+        return now()->addMinutes(10);
     }
 }

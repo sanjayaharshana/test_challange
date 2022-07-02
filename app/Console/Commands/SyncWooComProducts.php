@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\ApiResponse;
 use App\Models\Product;
 use App\Jobs\SyncWooComProduct;
+use Illuminate\Support\Facades\Artisan;
 class SyncWooComProducts extends Command
 {
     /**
@@ -32,43 +33,32 @@ class SyncWooComProducts extends Command
     {
         // Starting Synchrnoize Command
 
-        $this->info('WooCommerce Product Synchronize...');
-        Log::info('WooCommerce Product Synchronizing');
+        try {
+            //Get Starting Time
 
-        // Get last Response Details
-        $getlastResponse = ApiResponse::getLastEndpointDetails(config('app.woocom_endpoint'));
+            // Get recent response from woocommerce
+            $getlastResponse = ApiResponse::getLastEndpointDetails(config('app.woocom_endpoint'));
+            Log::info('Get last Response ID:'.$getlastResponse);
 
-        // Check availble last respond data
-        if($getlastResponse){
-            Log::info('Found latest response: '.config('app.woocom_endpoint'));
-            Log::info('Found latest response: '.config('app.woocom_endpoint'));
-            Log::info('Last response time (sec): '. number_format($getlastResponse->response_time,2));
-            $this->info('Latest Response Time: '. number_format($getlastResponse->response_time,2));
-
-            // Check Respond Time < 1
-            if($getlastResponse->response_time < 1){
-                $this->info('Sync Queue Job Starting: 1 Minutes');
-                $this->info('Sync Queue Job Starting Time: '.now()->addMinute(1) );
-                Log::info('Queue Job Starting: '. '1 Minutes');
-
-                //Run Queue after 1 min
-                SyncWooComProduct::dispatch(SyncWooComProduct::class)->delay(now()->addMinute(1));
-            }else{
-                Log::info('Queue Job Starting: '. '5 Minutes');
-                $this->info('Sync Queue Job Starting: 5 Minutes');
-                $this->info('Sync Queue Job Starting: '.now()->addMinute(5) );
-
-                //Run Queue job after 5 min
-                SyncWooComProduct::dispatch(SyncWooComProduct::class)->delay(now()->addMinute(5));
+            //Check last response is avaible
+            if ($getlastResponse) {
+                // Loop Pages from total page count
+                for ($x = $getlastResponse->page_number + 1; $x <= $getlastResponse->total_page_count; $x++) {
+                    // Excute Queue Job with Last Response
+                    SyncWooComProduct::dispatch($x);
+                }
+            } else {
+                // Excute Queue Job Fist time
+                SyncWooComProduct::dispatch(1);
+                sleep(15);
+                $exitCode = Artisan::call('sync:wooproducts');
+                $this->info('Recalling');
             }
-
-        }else{
-            //If Respond details not avaible (first time respond)
-            Log::info('Latest response not found');
-            $this->info('Latest Response time not found');
-            $this->info('Sync Queue Starting');
-            Log::info('Queue Job Starting: '.'Now');
-            SyncWooComProduct::dispatch(SyncWooComProduct::class);
+        }catch (\Exception $exception){
+            $this->info('Something Wrong');
+            $this->info($exception);
+            Log::critical($exception);
         }
+
     }
 }
